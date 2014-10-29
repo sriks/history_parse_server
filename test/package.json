@@ -1,0 +1,13 @@
+{
+  "name": "test",
+  "description": "history test app",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "3.x",
+    "sparql-client": "0.0.2",
+    "underscore": "~1.6.0",
+    "feedparser": "~0.18.1",
+    "feed-read": "0.0.1"
+  }
+}

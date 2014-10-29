@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "History": {
+            "applicationId": "TGlDuEnH9uCRTirxJxzqWSjEth7sBfrY9wxpfw5f", 
+            "masterKey": "2aNW9lqA2pNR6jWpvKX2gEZFs3yTPB7KHqOv4dL2"
+        }, 
+        "_default": {
+            "link": "History"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.2.19"
+    }
+}
