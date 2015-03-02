@@ -152,7 +152,7 @@ var prepareThisDayInHistory = function(options, cb) {
                         success: function(today) {
                             var objectId = today.id;
                             console.log("Saved with objectId:"+objectId);
-                            sendPushNotification(today);
+                            sendPushNotificationForTodayContent(today)
                             cb(null, objectId);
                         },
                         error: function(today, error) {
@@ -318,10 +318,10 @@ var _parseDbpediaResult = function(result) {
 }
 
 /*!
-Sends push notification.
+Sends push notification for today content. 
 today: The today parse object.
 **/
-var sendPushNotification = function(today) {
+var sendPushNotificationForTodayContent = function(today) {
   var pushQuery = new Parse.Query(Parse.Installation);
     pushQuery.equalTo('deviceType', 'ios');
       
@@ -329,7 +329,9 @@ var sendPushNotification = function(today) {
       where: pushQuery, // Set our Installation query
       data: {
         alert: today.get('title'),
-        objectId: today.id
+        objectId: today.id,
+        // App defined push notification types. See app for detailed types
+        t: 1
       }
     }, {
       success: function() {
