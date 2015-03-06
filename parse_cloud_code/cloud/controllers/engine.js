@@ -123,8 +123,10 @@ var fetchToday = function(options, cb) {
     var url = 'http://www.history.com/this-day-in-history/rss';
     fetchAndParseFeed(url, function(err, articles) {
         if(articles && _.size(articles)) {
+            console.log("fetchToday completed successfully.")
             cb(null, _.first(articles));
         } else {
+            console.log("fetchToday failed " + err);
             cb(err, null);
         }
     });
@@ -169,7 +171,20 @@ var prepareThisDayInHistory = function(options, cb) {
 }
 
 /*!
-Queries an NPL webservice to get linked data from text.
+Queries an NPL webservice to get linked data from article text.
+Returns an array of linkeddata articles in the following structure
+[{
+  "abstract":"The Nobel Prize (Swedish pronunciation: [noˈbɛl], Swedish definite form, singular: Nobelpriset; Norwegian: Nobelprisen) is a set of annual international awards bestowed in a number of categories by Swedish and Norwegian committees in recognition of cultural and/or scientific advances. The will of the Swedish inventor Alfred Nobel established the prizes in 1895. The prizes in Physics, Chemistry, Physiology or Medicine, Literature, and Peace were first awarded in 1901.",
+  "dbpedia":"http://dbpedia.org/resource/Nobel_Prize",
+  "freebase":"http://rdf.freebase.com/ns/m.059x1",
+  "opencyc":"http://sw.opencyc.org/concept/Mx4rvVj_y5wpEbGdrcN5Y29ycA",
+  "relevance":"0.401419",
+  "text":"Nobel Prize",
+  "thumbnail":"http://en.wikipedia.org/wiki/Special:FilePath/Nobel_Prize.png?width=300",
+  "website":"http://nobelprize.org",
+  "wiki":"http://en.wikipedia.org/wiki/Nobel_Prize",
+  "yago":"http://yago-knowledge.org/resource/Nobel_Prize"
+}, {...}, ...]
 **/
 var findLinkedData =  function(text, cb) {
     var req = {};
@@ -219,12 +234,12 @@ var findLinkedData =  function(text, cb) {
             // Once fetched the result is set as value in the same order. 
             _.each(concepts, function(element, index) {
                 var dbpedia = element.dbpedia;
-                linkedData[dbpedia] = "";
+                linkedData[dbpedia] = null;
             });
             
             async.forEach(concepts, function(concept, asycCallback) {
                 _fetchLinkedData(concept.dbpedia, function(err, dbpediaResult) {
-                    console.log("fetched linkeddata for "+concept.text);
+                    console.log("result for linkeddata "+concept.text);
                     if(dbpediaResult) {
                         var dbpedia = dbpediaResult.dbpedia;
                         dbpediaResult = _.extend(concept, dbpediaResult);                        
@@ -238,6 +253,15 @@ var findLinkedData =  function(text, cb) {
                 });
             }, function(err) {
                 console.log("linkeddata:"+JSON.stringify(linkedData));
+                // Iterate through linked data and remove items which dont have a value
+                _.each(linkedData, function(value, key, list) {
+                    console.log("checking linekeddata "+key);
+                    if(!linkedData[key]) {
+                      console.log("Deleting no-value linkeddata key " + key);
+                      delete linkedData[key];
+                    }
+                });
+
                 if(!err) 
                     cb(null, _.values(linkedData));
                 else 
