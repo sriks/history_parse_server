@@ -1,4 +1,4 @@
-var _ = require('cloud/libs/underscore.js')
+var _ = require('underscore.js');
 var FeedRead = require('cloud/libs/feed-read/index.js')
 var async = require('cloud/libs/async.js')
 
@@ -338,6 +338,7 @@ var _parseDbpediaResult = function(result) {
         finalResult['abstract'] = finalResult['callret-0'];
         finalResult = _.omit(finalResult, 'callret-0');
     }
+    console.log("parse dbpedia result:\n"+JSON.stringify(finalResult));
     return finalResult;
 }
 
@@ -368,7 +369,6 @@ var sendPushNotificationForTodayContent = function(today) {
 }
 
 module.exports = {
-    //fetchToday: fetchToday
     fetchToday: prepareThisDayInHistory
 }
 

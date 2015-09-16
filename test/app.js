@@ -6,6 +6,8 @@ var SparqlClient = require('sparql-client');
 //var util = require('util');
 var endpoint = 'http://dbpedia.org/sparql';
 
+var engine = require('../parse_cloud_code/cloud/controllers/engine.js');
+
 String.prototype.format = function () {
     var args = arguments;
     return this.replace(/\{\{|\}\}|\{(\d+)\}/g, function (m, n) {
@@ -15,29 +17,44 @@ String.prototype.format = function () {
     });
 };
 
-app.post('/test', function(req, res){
-    parseFeed();
-    
-    // Get the leaderName(s) of the given citys
-    // if you do not bind any city, it returns 10 random leaderNames
-    //var query = "SELECT * FROM <http://dbpedia.org> WHERE { ?city <http://dbpedia.org/property/leaderName> ?leaderName } LIMIT 10";
-    //var query = "select str(?abstract) ?thumbnail ?wiki where { <http://dbpedia.org/resource/Steve_Jobs> <http://www.w3.org/2000/01/rdf-schema#comment> ?abstract. FILTER (langMatches(lang(?abstract),\"en\")) <http://dbpedia.org/resource/Steve_Jobs> <http://dbpedia.org/ontology/thumbnail> ?thumbnail.   <http://dbpedia.org/resource/Steve_Jobs> <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> ?wiki}";
 
-    var queryFormat = "select str(?abstract) ?wiki where { <{0}> <http://www.w3.org/2000/01/rdf-schema#comment> ?abstract. FILTER (langMatches(lang(?abstract),\"en\"))  <{1}> <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> ?wiki}";
-    var query = queryFormat.format('http://dbpedia.org/resource/Steve_Jobs', 'http://dbpedia.org/resource/Steve_Jobs');
-    var client = new SparqlClient(endpoint);
-    console.log("Query to " + endpoint);
-    console.log("Query: " + query);
-    client.query(query).
-        execute(function(error, results) {
-        if(results != null) {
-              console.log("result:"+JSON.stringify(results));
-              var tmp = parseResult(results);
-              console.log(JSON.stringify(tmp));
-              res.send(tmp);
+app.post('/testtoday', function(req, res){
+    console.log("starting testing today");
+    engine.fetchToday(null, function(err, result) {
+        if(err) {
+            console.log("Error response: "+JSON.stringify(err));
+            res.send(err);
+        } else {
+            console.log("Success response: "+JSON.stringify(result));
+            status.success(result);    
         }
     });
 });
+
+
+// app.post('/test', function(req, res){
+//     parseFeed();
+    
+//     // Get the leaderName(s) of the given citys
+//     // if you do not bind any city, it returns 10 random leaderNames
+//     //var query = "SELECT * FROM <http://dbpedia.org> WHERE { ?city <http://dbpedia.org/property/leaderName> ?leaderName } LIMIT 10";
+//     //var query = "select str(?abstract) ?thumbnail ?wiki where { <http://dbpedia.org/resource/Steve_Jobs> <http://www.w3.org/2000/01/rdf-schema#comment> ?abstract. FILTER (langMatches(lang(?abstract),\"en\")) <http://dbpedia.org/resource/Steve_Jobs> <http://dbpedia.org/ontology/thumbnail> ?thumbnail.   <http://dbpedia.org/resource/Steve_Jobs> <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> ?wiki}";
+
+//     var queryFormat = "select str(?abstract) ?wiki where { <{0}> <http://www.w3.org/2000/01/rdf-schema#comment> ?abstract. FILTER (langMatches(lang(?abstract),\"en\"))  <{1}> <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> ?wiki}";
+//     var query = queryFormat.format('http://dbpedia.org/resource/Steve_Jobs', 'http://dbpedia.org/resource/Steve_Jobs');
+//     var client = new SparqlClient(endpoint);
+//     console.log("Query to " + endpoint);
+//     console.log("Query: " + query);
+//     client.query(query).
+//         execute(function(error, results) {
+//         if(results != null) {
+//               console.log("result:"+JSON.stringify(results));
+//               var tmp = parseResult(results);
+//               console.log(JSON.stringify(tmp));
+//               res.send(tmp);
+//         }
+//     });
+// });
 
 var parseResult = function(result) {
     var finalResult = {};
