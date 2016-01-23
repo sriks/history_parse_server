@@ -355,6 +355,7 @@ var sendPushNotificationForTodayContent = function(today) {
       data: {
         alert: today.get('title'),
         objectId: today.id,
+        badge: 1,
         // App defined push notification types. See app for detailed types
         t: 1
       }
